@@ -5,6 +5,11 @@ In this exercise, you will create a Pokemon class and use it to simulate battles
 This demonstrates object-oriented programming principles: encapsulation, methods, and clear responsibilities.
 """
 
+
+'''Student Name: Hashim Ali
+Student ID: 201967833'''
+
+
 import httpx, json
 
 
@@ -36,23 +41,24 @@ class Pokemon:
             data = response.json()
 
 
-        self.stats = {"attack":0, "defense":0, "speed": 0}
-        self.max_hp = 0
+            self.stats = {"attack":0, "defense":0, "speed": 0}
+            self.max_hp = 0
 
-        for stat in data['stats']:
-            if stat['stat']['name'] == 'attack':
-                self.stats['attack'] = self._calculate_stat(stat['base_stat'])
-            if stat['stat']['name'] == 'defense':
-                self.stats['defense'] = self._calculate_stat(stat['base_stat'])
-            if stat['stat']['name'] == 'speed':
-                self.stats['speed'] = self._calculate_stat(stat['base_stat'])
-            if stat['stat']['name'] == 'hp':
-                self.max_hp = self._calculate_hp(stat['base_stat'])    
-        
-        print(self.stats)
-        print(self.max_hp)
+            for stat in data['stats']:
+                if stat['stat']['name'] == 'attack':
+                    self.stats['attack'] = self._calculate_stat(stat['base_stat'])
+                if stat['stat']['name'] == 'defense':
+                    self.stats['defense'] = self._calculate_stat(stat['base_stat'])
+                if stat['stat']['name'] == 'speed':
+                    self.stats['speed'] = self._calculate_stat(stat['base_stat'])
+                if stat['stat']['name'] == 'hp':
+                    self.max_hp = self._calculate_hp(stat['base_stat'])    
+            
 
-        self.current_hp = self.max_hp
+            self.current_hp = self.max_hp
+
+        else:
+            return f"{self.name} is not a Pokemon!"
 
         # TODO: Calculate and store stats
         # - Use _calculate_stat() for attack, defense, speed
@@ -161,13 +167,61 @@ def simulate_battle(pokemon1_name, pokemon2_name):
         pokemon2_name (str): Name of the second Pokemon
     """
     # TODO: Create two Pokemon objects
-
+    pokemon1_name = Pokemon(pokemon1_name)
+    pokemon2_name = Pokemon(pokemon2_name)
     # TODO: Display battle start message
     # Show both Pokemon names and initial HP
-
+    print(f"""
+Pokemon Battle
+          
+{pokemon1_name.name} V {pokemon2_name.name}  """)
     # TODO: Determine who attacks first based on speed
     # The Pokemon with higher speed goes first
     # Hint: Compare pokemon1.stats['speed'] with pokemon2.stats['speed']
+    pokemon1_next = None
+    pokemon2_next = None
+
+    
+
+    pokemon1_name_fainted = False
+    pokemon2_name_fainted = False
+
+    if pokemon1_name.stats['speed'] > pokemon2_name.stats['speed']:
+        pokemon1_next = True
+    else:
+        pokemon2_next = True
+
+    round = 1
+
+    while pokemon1_name_fainted != True and pokemon2_name_fainted != True:
+        
+        print(f"Round {round}")
+
+        if pokemon1_next == True:
+            damage = pokemon1_name.attack(pokemon2_name)
+            print(f"{pokemon2_name.name} took {damage}. Has {pokemon2_name.current_hp} left")
+            pokemon2_name_fainted = pokemon2_name.is_fainted()
+            round += 1
+            pokemon2_next = True
+            pokemon1_next = False
+        elif pokemon2_next == True:
+            damage = pokemon2_name.attack(pokemon1_name)
+            print(f"{pokemon1_name.name} took {damage}. Has {pokemon1_name.current_hp} left")
+            pokemon1_name_fainted = pokemon1_name.is_fainted()
+            pokemon1_next = True
+            pokemon2_next = False
+            round += 1
+    
+    if pokemon2_name_fainted == True:
+        print(f"""
+{pokemon1_name.name} WON
+Has {pokemon1_name.current_hp} left""")
+    elif pokemon1_name_fainted == True:
+        print(f"""
+{pokemon2_name.name} WON
+Has {pokemon2_name.current_hp} left""")
+
+        
 
     # TODO: Battle loop
     # - Keep track of round number
@@ -181,15 +235,10 @@ def simulate_battle(pokemon1_name, pokemon2_name):
 
     # TODO: Display battle result
     # Show which Pokemon won and their remaining HP
-    pass
 
 
 if __name__ == "__main__":
     # Test your battle simulator
-    pikachu = Pokemon("pikachu")
-    print(pikachu)
-    # simulate_battle("pikachu", "bulbasaur")
 
     # Uncomment to test other battles:
-    # simulate_battle("charmander", "squirtle")
-    # simulate_battle("eevee", "jigglypuff")
+    simulate_battle("eevee", "jigglypuff")
